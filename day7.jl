@@ -24,7 +24,7 @@ Returns:
     * decoded opcode (the least significant two digits of the given raw `opcode`)
     * array of parameter modes based on the rest of digits
 """
-function decode_opcode(opcode::Int)::(Int, Array{Int,1})
+function decode_opcode(opcode::Int)
     pmodes = []
     if opcode > 99
         pmodes = Int.(digits(div(opcode, 100)))
