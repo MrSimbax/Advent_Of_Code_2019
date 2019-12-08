@@ -39,7 +39,7 @@ function main(height, width)
                 color = layer[i,j]
                 if color != 2
                     if color == 1
-                        print('*')
+                        print('█')
                     else
                         print(' ')
                     end
