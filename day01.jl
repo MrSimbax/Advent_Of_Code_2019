@@ -1,5 +1,5 @@
 function main()
-    open("input1.txt", "r") do inputfile
+    open("input01.txt", "r") do inputfile
         all_fuel = 0
         for line in eachline(inputfile)
             mass = parse(Int, line)

@@ -163,7 +163,7 @@ function print_output(out)
 end
 
 function main()
-    open("input9.txt", "r") do inputfile
+    open("input09.txt", "r") do inputfile
         srccode = [parse(Int, x) for x in split(strip(read(inputfile, String)), ",")]
 
         out = Array{Int,1}()

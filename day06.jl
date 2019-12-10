@@ -56,7 +56,7 @@ function find_common_ancestor(a::Node, b::Node, depth::Dict{String,Int})
 end
 
 function main()
-    T = read_tree("input6.txt")
+    T = read_tree("input06.txt")
     depth = find_depth(T)
     part1 = sum(values(depth))
     println("PART 1: $(part1)")

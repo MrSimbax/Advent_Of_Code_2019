@@ -24,7 +24,7 @@ function load_image(inputfile, height, width)
 end
 
 function main(height, width)
-    image = load_image("input8.txt", height, width)
+    image = load_image("input08.txt", height, width)
     
     # Part 1
     layer_id = argmin([count(px->px == 0, layer) for layer in image])

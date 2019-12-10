@@ -182,7 +182,7 @@ function next_permutation!(p)
 end
 
 function main()
-    open("input7.txt", "r") do inputfile
+    open("input07.txt", "r") do inputfile
         program = [parse(Int, x) for x in split(strip(read(inputfile, String)), ",")]
 
         for part in 1:2

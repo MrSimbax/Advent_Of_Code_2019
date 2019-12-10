@@ -1,9 +1,9 @@
-struct Point
+mutable struct Point
     x::Int
     y::Int
 end
 
-struct Segment
+mutable struct Segment
     from::Point
     to::Point
 end
@@ -32,7 +32,8 @@ function get_segments_from_moves(moves)
             next_pos = Point(current_pos.x + distance, current_pos.y)
             push!(segments, Segment(current_pos, next_pos))
         else
-            error("ERROR: bad direction: $direction")
+            println("ERROR: bad direction: $direction")
+            exit(1)
         end
         current_pos = next_pos
     end
@@ -95,7 +96,7 @@ function find_intersection(segment1::Segment, segment2::Segment)
 end
 
 function main()
-    open("input3.txt", "r") do inputfile
+    open("input03.txt", "r") do inputfile
         wire1 = split(strip(readline(inputfile)), ",")
         wire2 = split(strip(readline(inputfile)), ",")
         
@@ -106,70 +107,48 @@ function main()
         segments2 = get_segments_from_moves(wire2)
 
         min_intersection = nothing
-        min_intersection_steps = typemax(Int)
-        current_steps1 = 0
-        current_steps2 = 0
-        prev_seg1 = Point(0, 0)
-        prev_seg2 = Point(0, 0)
-        visited_intersections_steps_1 = Dict{Point,Int}()
-        visited_intersections_steps_2 = Dict{Point,Int}()
+        min_intersection_distance = typemax(Int)
         center = Point(0, 0)
         for segment1 in segments1
-            current_steps2 = 0
             for segment2 in segments2
                 intersection = find_intersection(segment1, segment2)
-                if intersection != nothing
-                    intersections = []
-                    if typeof(intersection) == Segment
-                        # The intersection is a segment, we must find the closest point on it
-                        if intersection.from.y == intersection.to.y
-                            y = intersection.from.y
-                            intersections = [Point(x, y) for x in intersection.from.x:intersection.to.x]
+                if intersection === nothing
+                    continue
+                elseif typeof(intersection) == Segment
+                    # The intersection is a segment, we must find the closest point on it
+                    is_horizontal = intersection.from.y == intersection.to.y
+                    if !is_horizontal
+                        x = intersection.from.x
+                        if is_in_segment(center.y, intersection.from.y, intersection.to.y)
+                            intersection = Point(x, center.y)
+                        elseif center.y > intersection.from.y 
+                            intersection = Point(x, intersection.from.y)
                         else
-                            x = intersection.from.x
-                            intersections = [Point(x, y) for y in intersection.from.y:intersection.to.y]
+                            intersection = Point(x, intersection.to.y)
                         end
                     else
-                        intersections = [intersection]
-                    end
-
-                    for intersection in intersections
-                        if metric(center, intersection) == 0
-                            continue
-                        end
-
-                        steps1 = current_steps1 + metric(prev_seg1, intersection)
-                        steps2 = current_steps2 + metric(prev_seg2, intersection)
-                        if haskey(visited_intersections_steps_1, intersection)
-                            steps1 = visited_intersections_steps_1[intersection]
+                        y = intersection.from.y
+                        if is_in_segment(center.x, intersection.from.x, intersection.to.x)
+                            intersection = Point(center.x, y)
+                        elseif center.x < intersection.from.x
+                            intersection = Point(intersection.from.x, y)
                         else
-                            visited_intersections_steps_1[intersection] = steps1
-                        end
-                        if haskey(visited_intersections_steps_2, intersection)
-                            steps2 = visited_intersections_steps_2[intersection]
-                        else
-                            visited_intersections_steps_2[intersection] = steps2
-                        end
-
-                        # Update minimum
-                        intersection_steps = steps1 + steps2
-                        if intersection_steps < min_intersection_steps
-                            min_intersection = intersection
-                            min_intersection_steps = intersection_steps
+                            intersection = Point(intersection.to.x, y)
                         end
                     end
                 end
 
-                current_steps2 += metric(segment2.from, segment2.to)
-                prev_seg2 = prev_seg2 == segment2.from ? segment2.to : segment2.from
+                # Update minimum
+                intersection_distance = metric(center, intersection)
+                if intersection_distance < min_intersection_distance && intersection_distance > 0
+                    min_intersection = intersection
+                    min_intersection_distance = intersection_distance
+                end
             end
-            
-            current_steps1 += metric(segment1.from, segment1.to)
-            prev_seg1 = prev_seg1 == segment1.from ? segment1.to : segment1.from
         end
 
         println(min_intersection)
-        println(min_intersection_steps)
+        println(min_intersection_distance)
     end
 end
 

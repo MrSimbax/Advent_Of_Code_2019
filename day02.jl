@@ -21,7 +21,7 @@ function run_program!(program::Array{Int,1})
 end
 
 function main()
-    open("input2.txt", "r") do inputfile
+    open("input02.txt", "r") do inputfile
         program = [parse(Int, x) for x in split(strip(read(inputfile, String)), ",")]
         
         # part 1

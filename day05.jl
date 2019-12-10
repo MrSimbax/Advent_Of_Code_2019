@@ -95,7 +95,7 @@ function run_program!(program::Array{Int,1})
 end
 
 function main()
-    open("input5.txt", "r") do inputfile
+    open("input05.txt", "r") do inputfile
         program = [parse(Int, x) for x in split(strip(read(inputfile, String)), ",")]
         run_program!(program)
     end
