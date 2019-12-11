@@ -5,25 +5,9 @@ using OffsetArrays
 
 function turn(dir, turndir)
     if turndir == 0
-        if dir == [0, 1]
-            [-1, 0]
-        elseif dir == [-1, 0]
-            [0, -1]
-        elseif dir == [0, -1]
-            [1, 0]
-        elseif dir == [1, 0]
-            [0, 1]
-        end
+        dir *= 1im
     elseif turndir == 1
-        if dir == [0, 1]
-            [1, 0]
-        elseif dir == [1, 0]
-            [0, -1]
-        elseif dir == [0, -1]
-            [-1, 0]
-        elseif dir == [-1, 0]
-            [0, 1]
-        end
+        dir *= -1im
     else
         error("Bad turndir: $turndir")
     end
@@ -62,7 +46,7 @@ function main()
     
     for part in 1:2
         points = Dict{Vector{Int},Int}()
-        dir = [0, 1]
+        dir = 0 + 1im
         pos = [0, 0]
         in = Array{Int,1}()
         out = Array{Int,1}()
@@ -77,7 +61,7 @@ function main()
             turndir = pop!(out)
             points[pos] = color
             dir = turn(dir, turndir)
-            pos += dir
+            pos += [real(dir), imag(dir)]
         end
         if part == 1
             println("PART 1: ", length(keys(points)))
