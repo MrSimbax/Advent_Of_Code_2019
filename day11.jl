@@ -16,11 +16,8 @@ end
 function draw(points)
     coords = keys(points)
     
-    min_x = minimum(v->v[1], coords)
-    max_x = maximum(v->v[1], coords)
-
-    min_y = minimum(v->v[2], coords)
-    max_y = maximum(v->v[2], coords)
+    (min_x, max_x) = extrema(v->v[1], coords)
+    (min_y, max_y) = extrema(v->v[2], coords)
     
     image = fill(0, max_y - min_y + 1, max_x - min_x + 1)
     image2 = OffsetArray(image, min_y:max_y, min_x:max_x)

@@ -25,7 +25,10 @@ function polar((x0, y0), (x, y))
     dy = y0 - y # flip y axis
     dx = x - x0
     r = norm([dx, dy])
-    g = gcd(dy, dx) # this ensures the result is the same for the same slope
+    # dividing by gcd first ensures the result is the same for the same slope
+    # so despite floating-point arithmetic the angles can be safely compared
+    # since the calculations are deterministic
+    g = gcd(dy, dx)
     # minus π / 2 because we want the angle 0 to point up
     # minus because we want clockwise instead of anticlockwise direction
     a = - (atan(div(dy, g), div(dx, g)) - π / 2)
