@@ -110,7 +110,7 @@ function main()
         run(`cmd /c cls`)
         draw(grid)
         println(score)
-        sleep(1 / 15)
+        sleep(1 / 30)
     end
 end
 
