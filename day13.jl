@@ -10,25 +10,27 @@ struct Tile
 end
 
 function draw(grid)
+    io = IOBuffer()
     for y in 0:(size(grid, 1) - 1)
         for x in 0:(size(grid, 2) - 1)
             c = grid[y,x]
             if c == 0
-                print(' ')
+                print(io, ' ')
             elseif c == 1
-                print('▧')
+                print(io, '▧')
             elseif c == 2
-                print('■')
+                print(io, '■')
             elseif c == 3
-                print('▬')
+                print(io, '▬')
             elseif c == 4
-                print('●')
+                print(io, '●')
             else
                 error("Bad tile at ($x, $y): $c")
             end
         end
-        println()
+        println(io)
     end
+    println(String(take!(io)))
 end
 
 function main()
@@ -105,16 +107,11 @@ function main()
 
         t += 1
 
-        if t % 60 == 0
-            draw(grid)
-            println(score)
-            println()
-        end
+        run(`cmd /c cls`)
+        draw(grid)
+        println(score)
+        sleep(1 / 15)
     end
-
-    draw(grid)
-    println(score)
-    println()
 end
 
 main()
