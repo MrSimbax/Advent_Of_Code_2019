@@ -1,4 +1,4 @@
-mutable struct Moon
+struct Moon
     pos::Vector{Int}
     vel::Vector{Int}
 end
@@ -33,7 +33,7 @@ end
 
 function update_positions!(moons::Vector{Moon})
     for moon ∈ moons
-        moon.pos += moon.vel
+        moon.pos .+= moon.vel
     end
 end
 
@@ -111,6 +111,7 @@ function main()
 
     part1(init_moons)
     part2(init_moons)
+    @time part2(init_moons)
 end
 
 main()
