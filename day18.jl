@@ -1,7 +1,3 @@
-include("IntCode.jl")
-
-using .IntCode
-
 using OffsetArrays
 
 struct Edge
@@ -94,7 +90,7 @@ function make_full_graph(grid::AbstractArray{Char,2})
     walkable = union!(walkable, Char.(Int('a'):Int('z')))
     walkable = union!(walkable, Char.(Int('A'):Int('Z')))
     walkable = union!(walkable, ['@'])
-    keys = Set(uppercase.(map(i->grid[i], findall(c->islowercase(c), grid))))
+    all_keys = Set(uppercase.(map(i->grid[i], findall(c->islowercase(c), grid))))
     for from ∈ values(nodes)
         distance_grid = make_distance_grid(grid, from.pos, walkable)
         for to ∈ values(nodes)
@@ -105,7 +101,7 @@ function make_full_graph(grid::AbstractArray{Char,2})
             if !isempty(path)
                 doors = Set(map(i->grid[path[i]...], findall(p->isuppercase(grid[p...]), path)))
                 # Remove doors with no key
-                doors = intersect(doors, uppercase.(keys))
+                # doors = intersect(doors, uppercase.(keys))
                 from.edges[to.name] = Edge(path, doors)
             end
         end
@@ -186,6 +182,92 @@ function part1(grid::AbstractArray{Char,2})
     # println(path)
 end
 
+function the_shortest_hamiltonian_path2(graphs::Vector{Graph})
+    paths = Dict{Tuple{String,Set{Char}},Int}()
+    start = ("@"^length(graphs), Set{Char}())
+    paths[start] = 0
+    Q = [start]
+    i = -1
+    while !isempty(Q)
+        state = pop!(Q)
+        # println(state)
+        if length(state[2]) != i
+            i = length(state[2])
+            # println("i=", i)
+        end
+        for robot ∈ axes(graphs, 1)
+            node = graphs[robot].nodes[state[1][robot]]
+            reachable = find_reachable_nodes(graphs[robot], node, state[2])
+            if isempty(reachable)
+                continue
+            end
+            for next_node ∈ reachable
+                nodes = collect(state[1])
+                nodes[robot] = next_node.name
+                nodes = join(nodes)
+                next_state = (nodes, union(Set(next_node.name), state[2]))
+                path = paths[state] + length(node.edges[next_node.name].path)
+                if haskey(paths, next_state)
+                    if path < paths[next_state]
+                        paths[next_state] = path
+                    else
+                        # nothing
+                    end
+                else
+                    # println(next_state)
+                    # println(path)
+                    paths[next_state] = path
+                    pushfirst!(Q, next_state)
+                end
+            end
+        end
+    end
+
+    # display(paths); println()
+    fullset = Set{Char}()
+    all_nodes = Vector{Vector{Char}}()
+    for robot ∈ axes(graphs, 1)
+        union!(fullset, setdiff(Set(keys(graphs[robot].nodes)), Set('@')))
+        push!(all_nodes, filter(k->k != '@', collect(keys(graphs[robot].nodes))))
+    end
+    min_path_length = typemax(Int)
+    for nodes ∈ join.(find_all_combinations(all_nodes))
+        if haskey(paths, (nodes, fullset))
+            path = paths[(nodes, fullset)]
+            if path < min_path_length
+                min_path_length = path
+            end
+        else
+            # println("Not found: ", (node, fullset))
+        end
+    end
+
+    return min_path_length
+end
+
+function find_all_combinations(arrays::Vector{Vector{T}}) where {T}
+    if isempty(arrays)
+        return Vector{Vector{T}}()
+    elseif length(arrays) == 1
+        ret = Vector{Vector{T}}()
+        A = arrays[1]
+        for a ∈ A
+            push!(ret, [a])
+        end
+        return ret
+    else
+        ret = Vector{Vector{T}}()
+        A = arrays[1]
+        combinations = find_all_combinations(arrays[2:end])
+        for a ∈ A
+            for combination ∈ combinations
+                push!(ret, [[a]; combination])
+            end
+        end
+        return ret
+    end
+end
+
 function part2!(grid::AbstractArray{Char,2})
     # prepare grids
     start_pos = findfirst(p->p == '@', grid)
@@ -210,19 +292,13 @@ function part2!(grid::AbstractArray{Char,2})
         grid[start_pos[1]:end, start_pos[2]:end]
     ]
 
-    total_length = 0
-    for i ∈ axes(grids, 1)
-        graph = make_full_graph(grids[i])
-        path = the_shortest_hamiltonian_path(graph, graph.nodes['@'])
-        # println(path)
-        total_length += path
-    end
-    println("PART 2: ", total_length)
+    graphs = map(g->make_full_graph(g), grids)
+    path = the_shortest_hamiltonian_path2(graphs)
+    println("PART 2: ", path)
 end
 
 function main()
     grid = load_grid("input18.txt")
-    
     part1(grid)
     part2!(grid)
 
