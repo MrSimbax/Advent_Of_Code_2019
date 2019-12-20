@@ -48,7 +48,7 @@ function make_distance_grid(grid::AbstractArray{Char,2},
         v = pop!(Q)
         dist_v = distance_grid[v...]
         if v == to
-            dist_v
+            return distance_grid
         end
         for n ∈ get_neighbours_in_bounds(grid, [v[1],v[2]])
             n = [n[1],n[2],v[3]]
