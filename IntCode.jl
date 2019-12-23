@@ -21,15 +21,31 @@ mutable struct Program
     pmodes::Array{Int,1} # current parameter modes
 end
 
-Program(srccode, in, out) = Program(srccode,
-    OffsetVector(srccode, 0:(length(srccode) - 1)),
-    in,
-    out,
-    0,
-    0, 
-    false,
-    0,
-    [])
+function Program(srccode)
+    raw_memory = copy(srccode)
+    Program(raw_memory,
+        OffsetVector(raw_memory, 0:(length(raw_memory) - 1)),
+        Vector{Int}(),
+        Vector{Int}(),
+        0,
+        0, 
+        false,
+        0,
+        [])
+end
+
+function Program(srccode, in, out)
+    raw_memory = copy(srccode)
+    Program(raw_memory,
+        OffsetVector(raw_memory, 0:(length(raw_memory) - 1)),
+        in,
+        out,
+        0,
+        0, 
+        false,
+        0,
+        [])
+end
 
 # Memory access functions
 function expand_memory!(program::Program, pos)
