@@ -1,4 +1,3 @@
-
 function load_data(filename)
     open(filename, "r") do file
         data = split(strip(read(file, String)), '\n')
